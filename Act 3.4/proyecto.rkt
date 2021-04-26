@@ -27,16 +27,16 @@
 
 #! Palabras reservadas
 (define rInt
-  '(#\i #\n #\t))
+  '(#\i #\n #\t #\space))
 
 (define rChar
-  '(#\c #\h #\a #\r))
+  '(#\c #\h #\a #\r #\space))
 
 (define rFloat
-    '(#\f #\l #\o #\a #\t))
+    '(#\f #\l #\o #\a #\t #\space))
 
 (define rString
-    '(#\s #\t #\r #\i #\n #\g))
+    '(#\s #\t #\r #\i #\n #\g #\space))
 
 (define rIf
   '(#\i #\f))
@@ -51,22 +51,22 @@
   '(#\f #\o #\r))
 
 (define rVar
-  '(#\v #\a #\r))
+  '(#\v #\a #\r #\space))
   
 (define rLet
-  '(#\l #\e #\t))
+  '(#\l #\e #\t #\space))
 
 (define rConst
-  '(#\c #\o #\n #\s #\t))
+  '(#\c #\o #\n #\s #\t #\space))
 
 (define rInclude
-  '(#\# #\i #\n #\c #\l #\u #\d #\e))
+  '(#\# #\i #\n #\c #\l #\u #\d #\e #\space))
 
 (define rStd
   '(#\s #\t #\d))
 
 (define rReturn
-  '(#\r #\e #\t #\u #\r #\n))
+  '(#\r #\e #\t #\u #\r #\n #\space))
 
 (define RW
   (lambda (lst rwlst count)
@@ -80,7 +80,7 @@
       [(empty? lst) 0]
       [(equal? (car lst) (car rwlst))
        (RW2 (cdr lst) (cdr rwlst) (+ count 1))]
-      [else count]
+      [else 0]
       )))
 
 #! Comentarios
@@ -160,8 +160,6 @@
        (comillas (cdr lst) (+ count 1) #\")]
       [(equal? (car lst) #\')
        (comillas (cdr lst) (+ count 1) #\')]
-      [(equal? (car lst) #\<)
-       (mqmq (cdr lst) (+ count 1))]
       [else 0]
       )))
 
@@ -175,10 +173,15 @@
 
 (define mqmq
   (lambda (lst count)
+   (if (equal? (car lst) #\<)
+       (mqmq2 (cdr lst) (+ count 1)) 0)))
+
+(define mqmq2
+  (lambda (lst count)
     (cond
       [(empty? lst) 0]
       [(equal? (car lst) #\>) (+ count 1)]
-      [else (mqmq (cdr lst) (+ count 1))]
+      [else (mqmq2 (cdr lst) (+ count 1))]
       )))
 
 #! Leector
@@ -229,33 +232,47 @@
 
       ;palabras reservadas
       ;int
-      [(not (equal? (RW lst rInt 0) 0)) (dfa (pop lst (RW lst rInt 0)) (token "<span class='reserved-word'>" (RW lst rInt 0) lst html))]
+      [(not (equal? (RW lst rInt 0) 0))
+       (dfa (pop lst (RW lst rInt 0)) (token "<span class='reserved-word'>" (RW lst rInt 0) lst html))]
       ;char
-      [(not (equal? (RW lst rChar 0) 0)) (dfa (pop lst (RW lst rChar 0)) (token "<span class='reserved-word'>" (RW lst rChar 0) lst html))]
+      [(not (equal? (RW lst rChar 0) 0))
+       (dfa (pop lst (RW lst rChar 0)) (token "<span class='reserved-word'>" (RW lst rChar 0) lst html))]
       ;float
-      [(not (equal? (RW lst rFloat 0) 0)) (dfa (pop lst (RW lst rFloat 0)) (token "<span class='reserved-word'>" (RW lst rFloat 0) lst html))]
+      [(not (equal? (RW lst rFloat 0) 0))
+       (dfa (pop lst (RW lst rFloat 0)) (token "<span class='reserved-word'>" (RW lst rFloat 0) lst html))]
       ;string
-      [(not (equal? (RW lst rString 0) 0)) (dfa (pop lst (RW lst rString 0)) (token "<span class='reserved-word'>" (RW lst rString 0) lst html))]
+      [(not (equal? (RW lst rString 0) 0))
+       (dfa (pop lst (RW lst rString 0)) (token "<span class='reserved-word'>" (RW lst rString 0) lst html))]
       ;if
-      [(not (equal? (RW lst rIf 0) 0)) (dfa (pop lst (RW lst rIf 0)) (token "<span class='reserved-word'>" (RW lst rIf 0) lst html))]
+      [(not (equal? (RW lst rIf 0) 0))
+       (dfa (pop lst (RW lst rIf 0)) (token "<span class='reserved-word'>" (RW lst rIf 0) lst html))]
       ;else
-      [(not (equal? (RW lst rElse 0) 0)) (dfa (pop lst (RW lst rElse 0)) (token "<span class='reserved-word'>" (RW lst rElse 0) lst html))]
+      [(not (equal? (RW lst rElse 0) 0))
+       (dfa (pop lst (RW lst rElse 0)) (token "<span class='reserved-word'>" (RW lst rElse 0) lst html))]
       ;while
-      [(not (equal? (RW lst rWhile 0) 0)) (dfa (pop lst (RW lst rWhile 0)) (token "<span class='reserved-word'>" (RW lst rWhile 0) lst html))]
+      [(not (equal? (RW lst rWhile 0) 0))
+       (dfa (pop lst (RW lst rWhile 0)) (token "<span class='reserved-word'>" (RW lst rWhile 0) lst html))]
       ;for
-      [(not (equal? (RW lst rFor 0) 0)) (dfa (pop lst (RW lst rFor 0)) (token "<span class='reserved-word'>" (RW lst rFor 0) lst html))]
+      [(not (equal? (RW lst rFor 0) 0))
+       (dfa (pop lst (RW lst rFor 0)) (token "<span class='reserved-word'>" (RW lst rFor 0) lst html))]
       ;var
-      [(not (equal? (RW lst rVar 0) 0)) (dfa (pop lst (RW lst rVar 0)) (token "<span class='reserved-word'>" (RW lst rVar 0) lst html))]
+      [(not (equal? (RW lst rVar 0) 0))
+       (dfa (pop lst (RW lst rVar 0)) (token "<span class='reserved-word'>" (RW lst rVar 0) lst html))]
       ;let
-      [(not (equal? (RW lst rLet 0) 0)) (dfa (pop lst (RW lst rLet 0)) (token "<span class='reserved-word'>" (RW lst rLet 0) lst html))]
+      [(not (equal? (RW lst rLet 0) 0))
+       (dfa (pop lst (RW lst rLet 0)) (token "<span class='reserved-word'>" (RW lst rLet 0) lst html))]
       ;const
-      [(not (equal? (RW lst rConst 0) 0)) (dfa (pop lst (RW lst rConst 0)) (token "<span class='reserved-word'>" (RW lst rConst 0) lst html))]
+      [(not (equal? (RW lst rConst 0) 0))
+       (dfa (pop lst (RW lst rConst 0)) (token "<span class='reserved-word'>" (RW lst rConst 0) lst html))]
       ;include
-      [(not (equal? (RW lst rInclude 0) 0)) (dfa (pop lst (RW lst rInclude 0)) (token "<span class='include'>" (RW lst rInclude 0) lst html))]
+      [(not (equal? (RW lst rInclude 0) 0))
+       (dfa (pop lst (RW lst rInclude 0)) (token "<span class='include'>" (RW lst rInclude 0) lst html))]
       ;std
-      [(not (equal? (RW lst rStd 0) 0)) (dfa (pop lst (RW lst rStd 0)) (token "<span class='std'>" (RW lst rStd 0) lst html))]
+      [(not (equal? (RW lst rStd 0) 0))
+       (dfa (pop lst (RW lst rStd 0)) (token "<span class='std'>" (RW lst rStd 0) lst html))]
       ;return
-      [(not (equal? (RW lst rReturn 0) 0)) (dfa (pop lst (RW lst rReturn 0)) (token "<span class='reserved-word'>" (RW lst rReturn 0) lst html))]
+      [(not (equal? (RW lst rReturn 0) 0))
+       (dfa (pop lst (RW lst rReturn 0)) (token "<span class='reserved-word'>" (RW lst rReturn 0) lst html))]
 
       
       ;variables
@@ -281,6 +298,9 @@
       ;strings
       [(not (equal? (string lst 0) 0))
        (dfa (pop lst (string lst 0)) (token "<span class='string'>" (string lst 0) lst html))]
+      ;<>
+      [(not (equal? (mqmq lst 0) 0))
+       (dfa (pop lst (mqmq lst 0)) (token "<span class='string'>" (mqmq lst 0) lst html))]
       
       ;operadores
       [(equal? (car lst) #\=) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
