@@ -160,6 +160,8 @@
        (comillas (cdr lst) (+ count 1) #\")]
       [(equal? (car lst) #\')
        (comillas (cdr lst) (+ count 1) #\')]
+      [(equal? (car lst) #\<)
+       (mqmq (cdr lst) (+ count 1))]
       [else 0]
       )))
 
@@ -173,15 +175,10 @@
 
 (define mqmq
   (lambda (lst count)
-   (if (equal? (car lst) #\<)
-       (mqmq2 (cdr lst) (+ count 1)) 0)))
-
-(define mqmq2
-  (lambda (lst count)
     (cond
       [(empty? lst) 0]
       [(equal? (car lst) #\>) (+ count 1)]
-      [else (mqmq2 (cdr lst) (+ count 1))]
+      [else (mqmq (cdr lst) (+ count 1))]
       )))
 
 #! Leector
@@ -298,9 +295,6 @@
       ;strings
       [(not (equal? (string lst 0) 0))
        (dfa (pop lst (string lst 0)) (token "<span class='string'>" (string lst 0) lst html))]
-      ;<>
-      [(not (equal? (mqmq lst 0) 0))
-       (dfa (pop lst (mqmq lst 0)) (token "<span class='string'>" (mqmq lst 0) lst html))]
       
       ;operadores
       [(equal? (car lst) #\=) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
