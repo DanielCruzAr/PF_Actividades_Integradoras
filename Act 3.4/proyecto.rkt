@@ -4,14 +4,14 @@
 (require 2htdp/batch-io)
 
 (define lst
-  (string->list (read-file "/home/rubixs/Documents/ITC/ITC semestre 4/Implementacion de metodos computacionales/PF_Actividades_Integradoras/prueba.cpp")))
+  (string->list (read-file "/home/rubixs/Documents/ITC/ITC semestre 4/Implementacion de metodos computacionales/PF_Actividades_Integradoras/Act 3.4/prueba.cpp")))
 
 (define escribe
   (lambda (destination html)
     (write-file destination html)))
 
 (define destination
-  "/home/rubixs/Documents/ITC/ITC semestre 4/Implementacion de metodos computacionales/PF_Actividades_Integradoras/prueba.html")
+  "/home/rubixs/Documents/ITC/ITC semestre 4/Implementacion de metodos computacionales/PF_Actividades_Integradoras/Act 3.4/prueba.html")
 
 (define head
   "<!DOCTYPE html>
@@ -21,12 +21,64 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Actividad Integradora 3.4 Resaltador de sintaxis</title>
+    <link rel='stylesheet' href='css/style.css'>
 </head>
 <body>")
 
 #! Palabras reservadas
-(define reserved
-  '())
+(define rInt
+  '(#\i #\n #\t))
+
+(define rChar
+  '(#\c #\h #\a #\r))
+
+(define rFloat
+    '(#\f #\l #\o #\a #\t))
+
+(define rString
+    '(#\s #\t #\r #\i #\n #\g))
+
+(define rIf
+  '(#\i #\f))
+
+(define rElse
+  '(#\e #\l #\s #\e))
+
+(define rWhile
+  '(#\w #\h #\i #\l #\e))
+
+(define rFor
+  '(#\f #\o #\r))
+
+(define rVar
+  '(#\v #\a #\r))
+  
+(define rLet
+  '(#\l #\e #\t))
+
+(define rConst
+  '(#\c #\o #\n #\s #\t))
+
+(define rInclude
+  '(#\# #\i #\n #\c #\l #\u #\d #\e))
+
+(define rStd
+  '(#\s #\t #\d))
+
+(define RW
+  (lambda (lst rwlst count)
+  (if (equal? (car lst) (car rwlst))
+      (RW2 (cdr lst) (cdr rwlst) (+ count 1)) 0)))
+
+(define RW2
+  (lambda (lst rwlst count)
+    (cond
+      [(empty? rwlst) count]
+      [(empty? lst) 0]
+      [(equal? (car lst) (car rwlst))
+       (RW2 (cdr lst) (cdr rwlst) (+ count 1))]
+      [else count]
+      )))
 
 #! Comentarios
 (define comment
@@ -97,6 +149,35 @@
       [else count]
       )))
 
+#! Strings
+(define string
+  (lambda (lst count)
+    (cond
+      [(equal? (car lst) #\")
+       (comillas (cdr lst) (+ count 1) #\")]
+      [(equal? (car lst) #\')
+       (comillas (cdr lst) (+ count 1) #\')]
+      [(equal? (car lst) #\<)
+       (mqmq (cdr lst) (+ count 1))]
+      [else 0]
+      )))
+
+(define comillas
+  (lambda (lst count c)
+    (cond
+      [(empty? lst) 0]
+      [(equal? (car lst) c) count]
+      [else (comillas (cdr lst) (+ count 1) c)]
+      )))
+
+(define mqmq
+  (lambda (lst count)
+    (cond
+      [(empty? lst) 0]
+      [(equal? (car lst) #\>) count]
+      [else (mqmq (cdr lst) (+ count 1))]
+      )))
+
 #! Leector
 ;determinar si es entero o flotante
 (define isFloat
@@ -142,6 +223,34 @@
       ;comentarios
       [(not (equal? (comment lst 0) 0))
        (dfa (pop lst (comment lst 0)) (token "<span class='comment'>" (comment lst 0) lst html))]
+
+      ;palabras reservadas
+      ;int
+      [(equal? (car lst) #\i) (not (equal? (RW lst rInt 0) 0)) (dfa (pop lst (RW lst rInt 0)) (token "<span class='reserved-word'>" (RW lst rInt 0) lst html))]
+      ;char
+      [(equal? (car lst) #\c) (not (equal? (RW lst rChar 0) 0)) (dfa (pop lst (RW lst rChar 0)) (token "<span class='reserved-word'>" (RW lst rChar 0) lst html))]
+      ;float
+      [(equal? (car lst) #\f) (not (equal? (RW lst rFloat 0) 0)) (dfa (pop lst (RW lst rFloat 0)) (token "<span class='reserved-word'>" (RW lst rFloat 0) lst html))]
+      ;string
+      [(equal? (car lst) #\s) (not (equal? (RW lst rString 0) 0)) (dfa (pop lst (RW lst rString 0)) (token "<span class='reserved-word'>" (RW lst rString 0) lst html))]
+      ;if
+      [(equal? (car lst) #\i) (not (equal? (RW lst rIf 0) 0)) (dfa (pop lst (RW lst rIf 0)) (token "<span class='reserved-word'>" (RW lst rIf 0) lst html))]
+      ;else
+      [(equal? (car lst) #\e) (not (equal? (RW lst rElse 0) 0)) (dfa (pop lst (RW lst rElse 0)) (token "<span class='reserved-word'>" (RW lst rElse 0) lst html))]
+      ;while
+      [(equal? (car lst) #\w) (not (equal? (RW lst rWhile 0) 0)) (dfa (pop lst (RW lst rWhile 0)) (token "<span class='reserved-word'>" (RW lst rWhile 0) lst html))]
+      ;for
+      [(equal? (car lst) #\f) (not (equal? (RW lst rFor 0) 0)) (dfa (pop lst (RW lst rFor 0)) (token "<span class='reserved-word'>" (RW lst rFor 0) lst html))]
+      ;var
+      [(equal? (car lst) #\v) (not (equal? (RW lst rVar 0) 0)) (dfa (pop lst (RW lst rVar 0)) (token "<span class='reserved-word'>" (RW lst rVar 0) lst html))]
+      ;let
+      [(equal? (car lst) #\l) (not (equal? (RW lst rLet 0) 0)) (dfa (pop lst (RW lst rLet 0)) (token "<span class='reserved-word'>" (RW lst rLet 0) lst html))]
+      ;const
+      [(equal? (car lst) #\c) (not (equal? (RW lst rConst 0) 0)) (dfa (pop lst (RW lst rConst 0)) (token "<span class='reserved-word'>" (RW lst rConst 0) lst html))]
+      ;include
+      [(equal? (car lst) #\#) (not (equal? (RW lst rInclude 0) 0)) (dfa (pop lst (RW lst rInclude 0)) (token "<span class='include'>" (RW lst rInclude 0) lst html))]
+      ;std
+      [(equal? (car lst) #\s) (not (equal? (RW lst rStd 0) 0)) (dfa (pop lst (RW lst rStd 0)) (token "<span class='std'>" (RW lst rStd 0) lst html))]
       
       ;variables
       [(not (equal? (var lst 0) 0))
@@ -163,6 +272,10 @@
                         (dfa (pop lst (integer lst 0)) (token "<span class='int'>" (integer lst 0) lst html))])]
              )]
 
+      ;strings
+      [(or (or (equal? (car lst) #\") (equal? (car lst) #\')) (equal? (car lst) #\'))
+       (dfa (pop lst (string lst 0)) (token "<span class='string'>" (string lst 0) lst html))]
+      
       ;operadores
       [(equal? (car lst) #\=) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
       [(equal? (car lst) #\+) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
@@ -172,8 +285,22 @@
       [(equal? (car lst) #\^) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
       [(equal? (car lst) #\() (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
       [(equal? (car lst) #\)) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
-
-      ;
+      [(equal? (car lst) #\{) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\}) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\[) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\]) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\;) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\:) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\<) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\>) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      
+      ; Espacios
+      [(equal? (car lst) #\space) (dfa (cdr lst) (string-append html "&nbsp;"))]
+      ; Salto de lineas
+      [(equal? (car lst) #\newline) (dfa (cdr lst) (string-append html "<br>"))]
+      ; Tabs
+      [(equal? (car lst) #\tab) (dfa (cdr lst) (string-append html "&nbsp;&nbsp;&nbsp;&nbsp;"))]
+      
       [else
        (dfa (cdr lst) html)])
       )))
