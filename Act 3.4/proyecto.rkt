@@ -313,6 +313,13 @@
       [(equal? (car lst) #\:) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
       [(equal? (car lst) #\<) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
       [(equal? (car lst) #\>) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\|) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\%) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\&) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\?) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\!) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\\) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
+      [(equal? (car lst) #\~) (dfa (cdr lst) (token "<span class='operador'>" 1 lst html))]
       
       ; Espacios
       [(equal? (car lst) #\space) (dfa (cdr lst) (string-append html "&nbsp;"))]
