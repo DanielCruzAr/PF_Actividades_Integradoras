@@ -1,9 +1,11 @@
 /*
 ####################################
-# Actividad 3.2 Programando un DFA #
+# Actividad Integradora 5.3        #
+# Resaltador de sintaxis paralelo  #
+# Version 1                        #
 #                                  #
-# Daniel Cruz Arciniega            #
-# A01701370                        #
+# Daniel Cruz Arciniega A01701370  #
+# Manolo Ramirez Pintor            #
 ####################################
 */
 
@@ -13,6 +15,7 @@
 #include <stack>
 #include <fstream>
 #include <vector>
+#include <chrono> 
 
 using namespace std;
 
@@ -225,12 +228,18 @@ string DFA::toString() {
 }
 
 int main(int argc, char* argv[]) {
+	//tiempo inicial
+	auto start = chrono::steady_clock::now();
+	
 	DFA dfa;
-	string input;
 	
-	cout << "input: ";
-	getline(cin, input);
-	
-	dfa.lexerAritmetico(input);
+	dfa.lexerAritmetico("prueba1.txt");
 	cout << dfa.toString() << endl;
+	
+	//tiempo final
+	auto end = chrono::steady_clock::now();
+	
+	//tiempo total
+	double tiempo = double (chrono::duration_cast <chrono::nanoseconds> (end - start).count());
+	cout << "Tiempo de ejecucion: " << tiempo/1e9 << "s" << endl;
 }
