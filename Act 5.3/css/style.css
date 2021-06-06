@@ -1,0 +1,45 @@
+body {
+    padding: 3%;
+    background-color: #16171d;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 100%;
+    line-height: 150%;
+    color: #f0ead9;
+}
+
+.comment {
+    color: #3f5c3c;
+}
+
+.reserved-word {
+    color: #1882a4;
+}
+
+.var {
+    color: #f0ead9;
+}
+
+.operador {
+    color: #f0ead9;
+}
+
+
+.int{
+    color: #b6d7a8;
+}
+
+.float{
+    color: #b6d7a8;
+}
+
+.string{
+    color: brown;
+}
+
+.include{
+    color:#d62699;
+}
+
+.std{
+    color:#16f495;
+}

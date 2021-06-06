@@ -1,5 +1,5 @@
-b=7
+#include <iostream>
 
-a = 32.4 *(-8.6 - b)/       6.1E-8
+string siclvp = "esto es un string"
 
-d = a ^ b // Esto es un comentario
+string s2 = 'esto es otro string'
