@@ -5,7 +5,7 @@
 # Version 1                        #
 #                                  #
 # Daniel Cruz Arciniega A01701370  #
-# Manolo Ramirez Pintor            #
+# Manolo Ramirez Pintor A01706155  #
 ####################################
 */
 
@@ -27,7 +27,6 @@ class DFA {
 		
 	public:
 		DFA() {token=""; count = 0; index=0;}
-		//bool block(string);
 		void proccesEntry(string);
 		void lexerAritmetico(string);
 		bool rw(string, string, int);
@@ -40,18 +39,15 @@ class DFA {
 		void write();
 };
 
-//fucnion para los comentarios de bloque
-
 //funcion para las palabras reservadas
 bool DFA::rw(string s, string rws, int i){
 	stringstream aux;
-	int acum = 0;
+	int acum = -1;
 	
-	for(int j = i; j < rws.size(); j++){
+	for(int j = i; j < rws.size()+i; j++){
 		aux << s[j];
 		acum++;
 	}
-	
 	if(aux.str() == rws){
 		index += acum;
 		return true;
@@ -62,8 +58,6 @@ bool DFA::rw(string s, string rws, int i){
 
 //funcion para los caracteres que forman un string
 bool DFA::str(string s, int i){
-	int acum;
-	
 	if(s[i] == '"'){
 		index++;
 		for(int j = i+1; j < s.size(); j++){
@@ -168,76 +162,96 @@ void DFA::proccesEntry(string s){
 		}
 		
 		//Palabras reservadas
-		else if(rw(s, "int", i) == true){
-				token += "<span class='reserved-word'> int </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "char", i) == true){
-				token += "<span class='reserved-word'> char </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "float", i) == true){
-				token += "<span class='reserved-word'> float </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "string", i) == true){
-				token += "<span class='reserved-word'> string </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "if", i) == true){
-				token += "<span class='reserved-word'> if </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "else", i) == true){
-				token += "<span class='reserved-word'> else </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "while", i) == true){
-				token += "<span class='reserved-word'> while </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "for", i) == true){
-				token += "<span class='reserved-word'> for </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "var", i) == true){
-				token += "<span class='reserved-word'> var </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "let", i) == true){
-				token += "<span class='reserved-word'> let </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "const", i) == true){
-				token += "<span class='reserved-word'> const </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "include", i) == true){
-				token += "<span class='reserved-word'> include </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "std", i) == true){
-				token += "<span class='reserved-word'> std </span>";
-				count++;
-				i += index;
-			}
-		else if(rw(s, "return", i) == true){
-				token += "<span class='reserved-word'> return </span>";
-				count++;
-				i += index;
-			}
+		else if(isalpha(c) && rw(s, "int", i) == true){
+			token += "<span class='reserved-word'> int </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "char", i) == true){
+			token += "<span class='reserved-word'> char </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "float", i) == true){
+			token += "<span class='reserved-word'> float </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "string", i) == true){
+			token += "<span class='reserved-word'> string </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "bool", i) == true){
+			token += "<span class='reserved-word'> bool </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "auto", i) == true){
+			token += "<span class='reserved-word'> auto </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "long", i) == true){
+			token += "<span class='reserved-word'> long </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "void", i) == true){
+			token += "<span class='reserved-word'> void </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "if", i) == true){
+			token += "<span class='reserved-word'> if </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "else", i) == true){
+			token += "<span class='reserved-word'> else </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "while", i) == true){
+			token += "<span class='reserved-word'> while </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "for", i) == true){
+			token += "<span class='reserved-word'> for </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "var", i) == true){
+			token += "<span class='reserved-word'> var </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "let", i) == true){
+			token += "<span class='reserved-word'> let </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "const", i) == true){
+			token += "<span class='reserved-word'> const </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "include", i) == true){
+			token += "<span class='reserved-word'> include </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "std", i) == true){
+			token += "<span class='reserved-word'> std </span>";
+			count++;
+			i += index;
+		}
+		else if(isalpha(c) && rw(s, "return", i) == true){
+			token += "<span class='reserved-word'> return </span>";
+			count++;
+			i += index;
+		}
 		
 		//Variables
 		else if(isalpha(c)) {
@@ -297,6 +311,11 @@ void DFA::proccesEntry(string s){
 		
 		//Operadores
 		else if(c == '=') {
+			aux << c;
+			token += "<span class='operador'>" + aux.str() + "</span>";
+			count++;
+		}
+		else if(c == ',') {
 			aux << c;
 			token += "<span class='operador'>" + aux.str() + "</span>";
 			count++;
@@ -407,22 +426,26 @@ void DFA::proccesEntry(string s){
 			count++;
 		}
 		
+		//Tabs
+		else if(c == '\t') {
+			token += "&nbsp;&nbsp;&nbsp;&nbsp;";
+		}
+		
 		//Espacios
 		else if(c == ' ') {
-			token += " ";
+			token += "&nbsp;";
 		}
 	}
 }
 
 //funcion que recibe el nombre de un archivo y lo lee si lo encuentra 
 void DFA::lexerAritmetico(string archivo){
-	string line;
+	string line, block;
 	
 	ifstream lee(archivo);
-	if (lee.is_open()){
+	if (lee.is_open()){	
 		while (getline(lee, line, '\n')){
 			//procesar entrada
-			//block
 			proccesEntry(line);
 			token += "<br>";
 		}
@@ -436,7 +459,7 @@ void DFA::lexerAritmetico(string archivo){
 
 //funcion para escribir el archivo .html
 void DFA::write() {
-	string head = "<!DOCTYPE html><html lang='en'><head> <meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Actividad Integradora 3.4 Resaltador de sintaxis</title><link rel='stylesheet' href='css/style.css'></head><body>";
+	string head = "<!DOCTYPE html><html lang='en'><head> <meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Actividad Integradora 5.3 Resaltador de sintaxis paralelo</title><link rel='stylesheet' href='css/style.css'></head><body>";
 	
 	ofstream escribe("prueba.html");
 	if(escribe.is_open()){
@@ -455,12 +478,18 @@ string DFA::toString() {
 }
 
 int main(int argc, char* argv[]) {
+    string file;
+	
+	cout << "Introduzca el nombre del archivo que desea cargar: ";
+	getline(cin, file);
+	cout << "\n";
+	
 	//tiempo inicial
 	auto start = chrono::steady_clock::now();
 	
 	DFA dfa;
 	
-	dfa.lexerAritmetico("prueba1.txt");
+	dfa.lexerAritmetico(file);
 	//cout << dfa.toString() << endl;
 	dfa.write();
 	
