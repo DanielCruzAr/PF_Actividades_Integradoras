@@ -9,6 +9,8 @@
 ####################################
 */
 
+// Para compilar: g++ act5.2_v1.cpp -openmp
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -16,6 +18,7 @@
 #include <fstream>
 #include <vector>
 #include <chrono> 
+#include <omp.h>
 
 using namespace std;
 
@@ -146,294 +149,346 @@ string DFA::entero(string s, int i) {
 //función que recibe un string y clasifica cada caracter
 void DFA::proccesEntry(string s){
 	char c;
-	
-	for (int i = 0; i < s.size(); i++){
-		c = s[i];
-		stringstream aux;
-		index = 0;
-		
-		//Comentarios 
-		if(c == '/' && s[i+1] == '/') {
-			for(int j = i; j < s.size(); j++)
-				aux << s[j];
-			token += "<span class='comment'>" + aux.str() + "</span>";
-			count++;
-			break;
-		}
-		
-		//Palabras reservadas
-		else if(isalpha(c) && rw(s, "int", i) == true){
-			token += "<span class='reserved-word'> int </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "char", i) == true){
-			token += "<span class='reserved-word'> char </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "float", i) == true){
-			token += "<span class='reserved-word'> float </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "string", i) == true){
-			token += "<span class='reserved-word'> string </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "bool", i) == true){
-			token += "<span class='reserved-word'> bool </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "auto", i) == true){
-			token += "<span class='reserved-word'> auto </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "long", i) == true){
-			token += "<span class='reserved-word'> long </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "void", i) == true){
-			token += "<span class='reserved-word'> void </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "if", i) == true){
-			token += "<span class='reserved-word'> if </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "else", i) == true){
-			token += "<span class='reserved-word'> else </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "while", i) == true){
-			token += "<span class='reserved-word'> while </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "for", i) == true){
-			token += "<span class='reserved-word'> for </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "var", i) == true){
-			token += "<span class='reserved-word'> var </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "let", i) == true){
-			token += "<span class='reserved-word'> let </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "const", i) == true){
-			token += "<span class='reserved-word'> const </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "include", i) == true){
-			token += "<span class='reserved-word'> include </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "std", i) == true){
-			token += "<span class='reserved-word'> std </span>";
-			count++;
-			i += index;
-		}
-		else if(isalpha(c) && rw(s, "return", i) == true){
-			token += "<span class='reserved-word'> return </span>";
-			count++;
-			i += index;
-		}
-		
-		//Variables
-		else if(isalpha(c)) {
-			aux << c;
-			aux << var(s, i+1);
-			token += "<span class='var'>" + aux.str() + "</span>";
-			count++;
-			i += index;
-		}
-		
-		
-		//Enteros y flotantes
-		else if(isdigit(c) || (c == '-' && isdigit(s[i+1]) && s[i-1] == ('('))) {
-			aux << c;
+
+	#pragma omp parallel
+	{
+		for (int i = 0; i < s.size(); i++){
+			c = s[i];
+			stringstream aux;
+			index = 0;
 			
-			switch(isFloat(s, i+1)){
-				case true:
-					aux << nfloat(s, i+1);
-					token += "<span class='float'>" + aux.str() + "</span>";
-					count++;
-					i += index;
-					break;
-				case false:
-					aux << nfloat(s, i+1);
-					token += "<span class='int'>" + aux.str() + "</span>";
-					count++;
-					i += index;
-					break;
+			//Comentarios 
+			if(c == '/' && s[i+1] == '/') {
+				for(int j = i; j < s.size(); j++)
+					aux << s[j];
+				#pragma omp critical
+				token += "<span class='comment'>" + aux.str() + "</span>";
+				count++;
+				break;
 			}
-		}
-		
-		//Strings
-		else if(str(s, i) == true) {
-			aux << c;
-			for(int j = i+1; j < s.size(); j++){
-				aux << s[j];
-				if(s[j] == '"' || s[j] == '\'' || s[j] == '>')
-					break;
+			
+			//Palabras reservadas
+			else if(isalpha(c) && rw(s, "int", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> int </span>";
+				count++;
+				i += index;
 			}
-			token += "<span class='string'>" + aux.str() + "</span>";
-			count ++;
-			i += index;
-		}
-		
-		//#include
-		else if(c == '#') {
-			for(int j = i; j < s.size(); j++){
-				aux << s[j];
-				index++;
-				if(s[j] == ' ')
-					break;
+			else if(isalpha(c) && rw(s, "char", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> char </span>";
+				count++;
+				i += index;
 			}
-			token += "<span class='include'>" + aux.str() + "</span>";
-			count ++;
-			i += index;
-		}
-		
-		//Operadores
-		else if(c == '=') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == ',') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '+') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '-') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '*') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '/') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '^') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '(') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == ')') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '{') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '}') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '[') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == ']') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == ';') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == ':') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '<') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '>') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '|') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '%') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '&') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '?') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '!') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		else if(c == '~') {
-			aux << c;
-			token += "<span class='operador'>" + aux.str() + "</span>";
-			count++;
-		}
-		
-		//Tabs
-		else if(c == '\t') {
-			token += "&nbsp;&nbsp;&nbsp;&nbsp;";
-		}
-		
-		//Espacios
-		else if(c == ' ') {
-			token += "&nbsp;";
+			else if(isalpha(c) && rw(s, "float", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> float </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "string", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> string </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "bool", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> bool </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "auto", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> auto </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "long", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> long </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "void", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> void </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "if", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> if </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "else", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> else </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "while", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> while </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "for", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> for </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "var", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> var </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "let", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> let </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "const", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> const </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "include", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> include </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "std", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> std </span>";
+				count++;
+				i += index;
+			}
+			else if(isalpha(c) && rw(s, "return", i) == true){
+				#pragma omp critical
+				token += "<span class='reserved-word'> return </span>";
+				count++;
+				i += index;
+			}
+			
+			//Variables
+			else if(isalpha(c)) {
+				aux << c;
+				aux << var(s, i+1);
+				#pragma omp critical
+				token += "<span class='var'>" + aux.str() + "</span>";
+				count++;
+				i += index;
+			}
+			
+			
+			//Enteros y flotantes
+			else if(isdigit(c) || (c == '-' && isdigit(s[i+1]) && s[i-1] == ('('))) {
+				aux << c;
+				
+				switch(isFloat(s, i+1)){
+					case true:
+						aux << nfloat(s, i+1);
+						#pragma omp critical
+						token += "<span class='float'>" + aux.str() + "</span>";
+						count++;
+						i += index;
+						break;
+					case false:
+						aux << nfloat(s, i+1);
+						#pragma omp critical
+						token += "<span class='int'>" + aux.str() + "</span>";
+						count++;
+						i += index;
+						break;
+				}
+			}
+			
+			//Strings
+			else if(str(s, i) == true) {
+				aux << c;
+				for(int j = i+1; j < s.size(); j++){
+					aux << s[j];
+					if(s[j] == '"' || s[j] == '\'' || s[j] == '>')
+						break;
+				}
+				#pragma omp critical
+				token += "<span class='string'>" + aux.str() + "</span>";
+				count ++;
+				i += index;
+			}
+			
+			//#include
+			else if(c == '#') {
+				for(int j = i; j < s.size(); j++){
+					aux << s[j];
+					index++;
+					if(s[j] == ' ')
+						break;
+				}
+				#pragma omp critical
+				token += "<span class='include'>" + aux.str() + "</span>";
+				count ++;
+				i += index;
+			}
+			
+			//Operadores
+			else if(c == '=') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == ',') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '+') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '-') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '*') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '/') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '^') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '(') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == ')') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '{') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '}') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '[') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == ']') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == ';') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == ':') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '<') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '>') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '|') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '%') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '&') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '?') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '!') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			else if(c == '~') {
+				aux << c;
+				#pragma omp critical
+				token += "<span class='operador'>" + aux.str() + "</span>";
+				count++;
+			}
+			
+			//Tabs
+			else if(c == '\t') {
+				#pragma omp critical
+				token += "&nbsp;&nbsp;&nbsp;&nbsp;";
+			}
+			
+			//Espacios
+			else if(c == ' ') {
+				#pragma omp critical
+				token += "&nbsp;";
+			}
 		}
 	}
 }
